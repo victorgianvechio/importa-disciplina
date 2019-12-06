@@ -110,6 +110,14 @@ const execDML = async (sql, param) => {
   }
 };
 
+// RECEBE UM ARQUIVO .SQL E CONVERTE PARA STRING
+const readSQL = async fileName => {
+  const sql = await fs
+    .readFileSync(path.resolve(__dirname, 'sql', fileName))
+    .toString();
+  return sql;
+};
+
 // TESTA CONEXÃO
 const testConnection = async () => {
   let conn = '';
@@ -130,13 +138,6 @@ const testConnection = async () => {
   } finally {
     if (conn) await conn.close();
   }
-};
-
-const readSQL = async fileName => {
-  const sql = await fs
-    .readFileSync(path.resolve(__dirname, 'sql', fileName))
-    .toString();
-  return sql;
 };
 
 // IDENTIFICA SE FOI PASSADO PARÂMETRO PARA A QUERY E CHAMA O MÉTODO RESPONSÁVEL

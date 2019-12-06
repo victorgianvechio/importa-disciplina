@@ -9,25 +9,24 @@ const proxID = require('./database/spProxId');
 const log = require('./util/logger');
 
 const importFile = async () => {
-  let file = process.argv[2];
-  let ext = '';
+  const [file, ext] = process.argv[2].split('.');
+  const ead = process.argv[3];
 
-  if (!file) {
+  if (!process.argv[2]) {
     process.exit(console.log('Arquivo não encontrado.'));
   }
 
-  [file, ext] = file.split('.');
-
-  if (ext !== 'xlsx') {
+  if (ext && ext !== 'xlsx') {
     process.exit(
-      console.log('Formato de arquivo inválido. Utilize apenas ".xlsx"')
+      console.log('Formato de arquivo inválido. Utilize apenas ".xlsx".')
     );
   }
 
-  console.log(file, ext);
-
-  const sqlInsert = await db.readSQL('insertDisciplina.sql');
-  const sqlGet = await db.readSQL('verificaDisciplinaExiste.sql');
+  const sqlInsertDisciplina = await db.readSQL('insertDisciplina.sql');
+  const sqlVerificaDisciplina = await db.readSQL(
+    'verificaDisciplinaExiste.sql'
+  );
+  const sqlInsertGradeCurric = await db.readSQL('insertGradeCurric.sql');
 
   const filePath = path.resolve(
     __dirname,
@@ -39,38 +38,51 @@ const importFile = async () => {
 
   readXlsxFile(filePath).then(async rows => {
     let codDisciplina = '';
-    let qtdOld = 0;
-    let qtdNew = 0;
+    let nroSeqGrade = '';
 
     await log.createFile(`${file}`);
     await log.debug(`Quantidade de registros: ${rows.length}\n`);
 
-    for (let i = 0; i < rows.length; i += 1) {
+    const [codCurso, codGrade] = [rows[0][0], rows[1][0]];
+
+    for (let i = 2; i < rows.length; i += 1) {
       const [descDisciplina, cargaHoraria, etapa] = [
         rows[i][0],
         rows[i][1],
         rows[i][2],
       ];
 
-      const data = await db.getData(sqlGet, [descDisciplina, cargaHoraria]);
+      const data = await db.getData(sqlVerificaDisciplina, [
+        descDisciplina,
+        cargaHoraria,
+      ]);
 
       if (!data.length) {
         codDisciplina = await proxID('DISCIPLINA');
-        await db.exec(sqlInsert, [codDisciplina, descDisciplina, cargaHoraria]);
-        qtdNew += 1;
+        await db.exec(sqlInsertDisciplina, [
+          codDisciplina,
+          descDisciplina,
+          cargaHoraria,
+        ]);
       } else {
         codDisciplina = data[0].COD_DISCIPLINA;
-        qtdOld += 1;
       }
 
+      nroSeqGrade = await proxID('GRADE_CURRIC');
+
+      await db.exec(sqlInsertGradeCurric, [
+        nroSeqGrade,
+        codCurso,
+        codGrade,
+        codDisciplina,
+        etapa,
+        ead === 1 || ead === 'ead' || ead === 'EAD' ? 1 : 0,
+      ]);
+
       await log.debug(
-        `${codDisciplina}\n\t${descDisciplina}\n\tEtapa: ${etapa}\n\tCH: ${cargaHoraria}\n`
+        `COD_DISCIPLINA: ${codDisciplina}\t${descDisciplina}\n\tNRO_SEQ_GRADE: ${nroSeqGrade}\n\tEtapa: ${etapa}\n\tCH: ${cargaHoraria}\n`
       );
     }
-
-    await log.debug(
-      `\nQuantidade nova: ${qtdNew}\nQuantidade existente: ${qtdOld}`
-    );
   });
 };
 
