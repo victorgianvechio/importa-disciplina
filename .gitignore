@@ -1,0 +1,19 @@
+# Log files
+*.log
+
+# Dependency directories
+node_modules
+
+# Environment files
+*.env
+
+# Text files
+*.txt
+
+# Executables
+*.exe
+
+# Excel files
+*.xls
+*.xlsx
+*.csv
