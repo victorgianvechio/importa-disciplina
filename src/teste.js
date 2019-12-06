@@ -41,7 +41,7 @@ const importFile = async () => {
     let nroSeqGrade = '';
 
     await log.createFile(`${file}`);
-    await log.debug(`Quantidade de registros: ${rows.length}\n`);
+    await log.debug(`Quantidade de registros: ${rows.length - 2}\n`);
 
     const [codCurso, codGrade] = [rows[0][0], rows[1][0]];
 
