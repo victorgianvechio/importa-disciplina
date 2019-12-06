@@ -12,7 +12,7 @@ const importFile = async () => {
   const [file, ext] = process.argv[2].split('.');
   const ead = process.argv[3];
 
-  if (!process.argv[2]) {
+  if (!file) {
     process.exit(console.log('Arquivo não encontrado.'));
   }
 
