@@ -1,73 +1,91 @@
-require('dotenv').config();
+/* eslint-disable no-await-in-loop */
+import 'dotenv/config';
 
-const readXlsxFile = require('read-excel-file/node');
-const path = require('path');
+import readXlsxFile from 'read-excel-file/node';
+import { resolve } from 'path';
+import { existsSync } from 'fs';
 
-const db = require('../../database/connection');
-const proxID = require('../../database/spProxId');
-const log = require('../../util/logger');
+import { readSQL, getData, exec } from '../../database/connection';
+import proxId from '../../database/spProxId';
+import { createFile, debug } from '../../util/logger';
 
 const importFile = async () => {
-  const sqlInsert = await db.readSQL('insertDisciplina.sql');
-  const sqlGet = await db.readSQL('verificaDisciplinaExiste.sql');
+  const [file, ext] = process.argv[2].split('.');
+  const ead = process.argv[3] && process.argv[3].toUpperCase();
 
-  return new Promise(resolve => {
-    readXlsxFile(
-      path.resolve(
-        __dirname,
-        '..',
-        'public',
-        'files',
-        `${process.env.FILE_NAME}.xlsx`
-      )
-    ).then(async rows => {
-      let codDisciplina = '';
-      let descDisciplina = '';
-      let cargaHoraria = '';
-      let etapa = '';
-      let status = '';
-      let qtdOld = 0;
-      let qtdNew = 0;
-      let result = '';
-      let i = '';
+  const filePath = resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'public',
+    'files',
+    `${file}.xlsx`
+  );
 
-      await log.createFile(`${process.env.FILE_NAME}`);
-      await log.debug(`Quantidade de registros: ${rows.length}\n`);
+  const existFile = existsSync(filePath);
 
-      for (i in rows) {
-        descDisciplina = rows[i][0];
-        cargaHoraria = rows[i][1];
-        etapa = rows[i][2];
+  if (!file || !existFile) {
+    process.exit(console.error('Arquivo não encontrado.'));
+  }
 
-        result = await db.getData(sqlGet, [descDisciplina, cargaHoraria]);
+  if (ext && ext !== 'xlsx') {
+    process.exit(
+      console.error('Formato de arquivo inválido. Utilize apenas ".xlsx".')
+    );
+  }
 
-        if (!result.length) {
-          codDisciplina = await proxID('DISCIPLINA');
-          result = await db.exec(sqlInsert, [
-            codDisciplina,
-            descDisciplina,
-            cargaHoraria,
-          ]);
+  const sqlInsertDisciplina = await readSQL('insertDisciplina.sql');
+  const sqlVerificaDisciplina = await readSQL('verificaDisciplinaExiste.sql');
+  const sqlInsertGradeCurric = await readSQL('insertGradeCurric.sql');
 
-          status = 'NEW';
-          qtdNew++;
-        } else {
-          codDisciplina = result[0].COD_DISCIPLINA;
-          status = 'OLD';
-          qtdOld++;
-        }
+  readXlsxFile(filePath).then(async rows => {
+    let codDisciplina = '';
+    let nroSeqGrade = '';
 
-        await log.debug(`${status}\t\t${codDisciplina}
-          \t${descDisciplina}
-          \tEtapa: ${etapa}
-          \tCH: ${cargaHoraria}\n`);
+    await createFile(`${file}`);
+    await debug(`Quantidade de registros: ${rows.length - 2}\n`);
 
-        resolve(result);
+    const [codCurso, codGrade] = [rows[0][0], rows[1][0]];
+
+    for (let i = 2; i < rows.length; i += 1) {
+      const [descDisciplina, cargaHoraria, etapa] = [
+        rows[i][0],
+        rows[i][1],
+        rows[i][2],
+      ];
+
+      const data = await getData(sqlVerificaDisciplina, [
+        descDisciplina,
+        cargaHoraria,
+      ]);
+
+      if (!data.length) {
+        codDisciplina = await proxId('DISCIPLINA');
+        await exec(sqlInsertDisciplina, [
+          codDisciplina,
+          descDisciplina,
+          cargaHoraria,
+        ]);
+      } else {
+        codDisciplina = data[0].COD_DISCIPLINA;
       }
-      await log.debug(
-        `\nQuantidade nova: ${qtdNew}\nQuantidade existente: ${qtdOld}`
+
+      nroSeqGrade = await proxId('GRADE_CURRIC');
+
+      await exec(sqlInsertGradeCurric, [
+        nroSeqGrade,
+        codCurso,
+        codGrade,
+        codDisciplina,
+        etapa,
+        ead === 1 || ead === '--EAD' ? 1 : 0,
+      ]);
+
+      await debug(
+        `COD_DISCIPLINA: ${codDisciplina}\t${descDisciplina}\n\tNRO_SEQ_GRADE: ${nroSeqGrade}\n\tEtapa: ${etapa}\n\tCH: ${cargaHoraria}\n`
       );
-    });
+    }
   });
 };
 

@@ -1,11 +1,10 @@
 /*
   RESPONSÁVEL POR CONECTAR NO BANCO DE DADOS E EXECUTAR QUERYS
 */
-const oracledb = require('oracledb');
-const fs = require('fs');
-const path = require('path');
-
-const dbConfig = require('../config/database');
+import oracledb from 'oracledb';
+import fs from 'fs';
+import path from 'path';
+import dbConfig from '../config/database';
 
 oracledb.outFormat = oracledb.OBJECT;
 
@@ -141,15 +140,15 @@ const testConnection = async () => {
 };
 
 // IDENTIFICA SE FOI PASSADO PARÂMETRO PARA A QUERY E CHAMA O MÉTODO RESPONSÁVEL
-function redirectFunction(param1, param2) {
+const redirectFunction = (param1, param2) => {
   if (typeof param2 === 'undefined') return getTableData(param1);
   return getTableDataParam(param1, param2);
-}
+};
 
-module.exports = {
-  getData: redirectFunction,
+export {
+  redirectFunction as getData,
   execProcedure,
-  exec: execDML,
+  execDML as exec,
   readSQL,
   testConnection,
 };

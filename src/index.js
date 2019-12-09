@@ -1,8 +1,8 @@
-require('dotenv').config();
+import 'dotenv/config';
 
-const express = require('express');
+import express from 'express';
 
-const db = require('./database/connection');
+import { testConnection } from './database/connection';
 
 const server = express();
 
@@ -12,7 +12,7 @@ const DOMAIN = process.domain || 'localhost';
 server.set('port', PORT);
 
 server.get('/', async (req, res) => {
-  const a = await db.testConnection();
+  const a = await testConnection();
   res.status(200).send(a);
 });
 

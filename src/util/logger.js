@@ -1,24 +1,24 @@
-const fs = require('fs');
-const util = require('util');
-const path = require('path');
+import { createWriteStream } from 'fs';
+import { format } from 'util';
+import { resolve, join } from 'path';
 
 const logStdout = process.stdout;
 
 let logFile = '';
 let logPath = '';
 
-logPath = path.resolve(__dirname, '..', '..', 'public', 'logs');
+logPath = resolve(__dirname, '..', '..', 'public', 'logs');
 
 const createFile = name => {
-  logFile = fs.createWriteStream(path.join(logPath, `insert_${name}.log`), {
+  logFile = createWriteStream(join(logPath, `insert_${name}.log`), {
     flags: 'w',
   });
 };
 
 // Gera arquivo de Log com nome extraído
 const debug = async d => {
-  logFile.write(`${util.format(d)}\n`);
-  logStdout.write(`${util.format(d)}\n`);
+  logFile.write(`${format(d)}\n`);
+  logStdout.write(`${format(d)}\n`);
 };
 
-module.exports = { debug, createFile };
+export { debug, createFile };

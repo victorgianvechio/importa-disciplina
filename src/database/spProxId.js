@@ -1,10 +1,10 @@
-const db = require('./connection');
+import { execProcedure } from './connection';
 
-async function SP_PROX_ID(ptabela) {
+const proxId = async ptabela => {
   const sql = 'BEGIN SP_PROX_ID(:ptabela, :pretorno); END;';
 
-  const result = await db.execProcedure(sql, ptabela);
+  const result = await execProcedure(sql, ptabela);
   return result.pretorno;
-}
+};
 
-module.exports = SP_PROX_ID;
+export default proxId;

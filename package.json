@@ -14,7 +14,7 @@
     "scripts": {
         "dev": "nodemon src/index.js",
         "dev:debug": "nodemon --inspect src/index.js",
-        "grade:import": "node src/teste.js",
+        "grade:import": "sucrase-node src/app/service/importXlsx.js",
         "lint": "node_modules/.bin/eslint **/*.js",
         "lint:fix": "node_modules/.bin/eslint **/*.js --fix"
     },
