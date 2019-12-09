@@ -1,2 +1,4 @@
-# Template genérico para criação de projetos
+# Importa Disciplinas - UNIVEM
+
+Cadastra disciplinas e grade curricular de um arquivo xlsx.
 
