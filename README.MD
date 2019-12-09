@@ -1,10 +1,10 @@
 # Importa Disciplinas - UNIVEM
 
-Cadastra disciplinas e grade curricular a partir de um arquivo xlsx.
+Cadastra as disciplinas e grade curricular a partir de um arquivo xlsx.
 
 ## Arquivos
 
-Colocar os arquivos na pasta *public/file*
+Os arquivos devem estar na pasta **public/file** para serem importados.
 
 ## Importar
 
@@ -12,7 +12,7 @@ Colocar os arquivos na pasta *public/file*
 yarn grade:import file.xlsx
 ```
 
-Parâmetro *--ead* opcional (insere as disciplinas na grade como EAD)
+Parâmetro **--ead** opcional (insere as disciplinas na grade como EAD).
 
 ```sh
 yarn grade:import file.xlsx --ead
