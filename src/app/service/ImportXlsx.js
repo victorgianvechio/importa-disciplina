@@ -23,9 +23,9 @@ const importFile = async () => {
     `${file}.xlsx`
   );
 
-  const existFile = existsSync(filePath);
+  const existsFile = existsSync(filePath);
 
-  if (!file || !existFile) {
+  if (!file || !existsFile) {
     process.exit(console.error('Arquivo não encontrado.'));
   }
 
@@ -38,15 +38,22 @@ const importFile = async () => {
   const sqlInsertDisciplina = await readSQL('insertDisciplina.sql');
   const sqlVerificaDisciplina = await readSQL('verificaDisciplinaExiste.sql');
   const sqlInsertGradeCurric = await readSQL('insertGradeCurric.sql');
+  const sqlVerificaGrade = await readSQL('verificaGradeExiste.sql');
 
   readXlsxFile(filePath).then(async rows => {
     let codDisciplina = '';
     let nroSeqGrade = '';
 
+    const [codCurso, codGrade] = [rows[0][0], rows[1][0]];
+
+    const existsGrade = await getData(sqlVerificaGrade, [codCurso, codGrade]);
+
+    if (!existsGrade.length) {
+      process.exit(console.error('Grade curricular não encontrada.'));
+    }
+
     await createFile(`${file}`);
     await debug(`Quantidade de registros: ${rows.length - 2}\n`);
-
-    const [codCurso, codGrade] = [rows[0][0], rows[1][0]];
 
     for (let i = 2; i < rows.length; i += 1) {
       const [descDisciplina, cargaHoraria, etapa] = [
