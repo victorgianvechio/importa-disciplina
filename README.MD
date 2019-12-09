@@ -4,7 +4,7 @@ Cadastra as disciplinas e grade curricular a partir de um arquivo xlsx.
 
 ## Arquivos
 
-Os arquivos devem estar na pasta **public/file** para serem importados.
+Os arquivos devem estar na pasta **public/files** para serem importados.
 
 ## Importar
 
