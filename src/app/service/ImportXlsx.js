@@ -71,11 +71,16 @@ const importFile = async () => {
       // Insert DISCIPLINA (caso não exista)
       if (!codDisciplina) {
         codDisciplina = await proxId('DISCIPLINA');
+
         await exec(sqlInsertDisciplina, [
           codDisciplina,
           descDisciplina,
           cargaHoraria,
-        ]);
+        ]).then(
+          result =>
+            result !== 1 &&
+            process.exit(console.error('Insert DISCIPLINA:', result))
+        );
       }
 
       // Pega o ultimo NRO_SEQ_GRADE
@@ -92,10 +97,7 @@ const importFile = async () => {
       ]).then(
         result =>
           result !== 1 &&
-          process.exit(
-            'INSERT GRADE_CURRIC: ',
-            console.error('Insert GRADE_CURRIC:', result)
-          )
+          process.exit(console.error('Insert GRADE_CURRIC:', result))
       );
 
       // Insere no arquivo de LOG

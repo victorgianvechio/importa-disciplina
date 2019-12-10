@@ -100,10 +100,7 @@ const importFile = async () => {
         ]).then(
           result =>
             result !== 1 &&
-            process.exit(
-              'INSERT DISCIPLINA: ',
-              console.error('Insert DISCIPLINA:', result)
-            )
+            process.exit(console.error('Insert DISCIPLINA:', result))
         );
       }
 
@@ -121,10 +118,7 @@ const importFile = async () => {
       ]).then(
         result =>
           result !== 1 &&
-          process.exit(
-            'INSERT GRADE_CURRIC: ',
-            console.error('Insert GRADE_CURRIC:', result)
-          )
+          process.exit(console.error('Insert GRADE_CURRIC:', result))
       );
 
       // Insere no arquivo de LOG
