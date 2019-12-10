@@ -45,7 +45,7 @@ const importFile = async () => {
 
   // Função que lê o arquivo .xlsx e retorna as linhas
   readXlsxFile(filePath).then(async rows => {
-    // Primeira linha deve contar o código do curso
+    // Primeira linha deve conter o código do curso e o código da grade
     const [codCurso, codGrade] = [rows[0][0], rows[0][1]];
 
     // Cria o arquivo de LOG
