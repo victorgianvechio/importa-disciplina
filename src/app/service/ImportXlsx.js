@@ -53,7 +53,7 @@ const importFile = async () => {
     await debug(`Quantidade de registros: ${rows.length - 1}\n`);
 
     // Laço que percorre cada linha do arquivo .xlsx
-    for (let i = 2; i < rows.length; i += 1) {
+    for (let i = 1; i < rows.length; i += 1) {
       const [descDisciplina, cargaHoraria, etapa] = [
         rows[i][0],
         rows[i][1],
