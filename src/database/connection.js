@@ -23,7 +23,6 @@ const getTableData = async sql => {
     result = await conn.execute(sql);
     return result.rows;
   } catch (err) {
-    console.error(`Error ${err.message}`);
     result = `Error ${err.message}`;
     return result;
   } finally {
@@ -46,7 +45,6 @@ const getTableDataParam = async (sql, param) => {
     result = await conn.execute(sql, param);
     return result.rows;
   } catch (err) {
-    console.error(`Error ${err.message}`);
     result = `Error ${err.message}`;
     return result;
   } finally {
@@ -74,7 +72,6 @@ const execProcedure = async (sql, ptabela) => {
     result = await conn.execute(sql, param);
     return result.outBinds;
   } catch (err) {
-    console.error(`Error ${err.message}`);
     result = `Error ${err.message}`;
     return result;
   } finally {
@@ -101,7 +98,6 @@ const execDML = async (sql, param) => {
     result = await conn.execute(sql, param, options);
     return result.rowsAffected;
   } catch (err) {
-    console.error(`Error ${err.message}`);
     result = `Error ${err.message}`;
     return result;
   } finally {
@@ -131,7 +127,6 @@ const testConnection = async () => {
     result = { connection: true };
     return result;
   } catch (err) {
-    console.error(`Error ${err.message}`);
     result = `Error ${err.message}`;
     return result;
   } finally {

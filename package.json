@@ -15,6 +15,7 @@
         "dev": "nodemon src/index.js",
         "dev:debug": "nodemon --inspect src/index.js",
         "grade:import": "sucrase-node src/app/service/importXlsx.js",
+        "grade:create-import": "sucrase-node src/app/service/importGradeXlsx.js",
         "lint": "node_modules/.bin/eslint **/*.js",
         "lint:fix": "node_modules/.bin/eslint **/*.js --fix"
     },
@@ -37,6 +38,7 @@
         "eslint-plugin-prettier": "^3.1.1",
         "nodemon": "^2.0.1",
         "prettier": "^1.19.1",
+        "run-func": "^1.0.3",
         "sucrase": "^3.10.1"
     }
 }

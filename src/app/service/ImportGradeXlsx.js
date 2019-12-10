@@ -42,18 +42,40 @@ const importFile = async () => {
   const sqlInsertDisciplina = await readSQL('insertDisciplina.sql');
   const sqlVerificaDisciplina = await readSQL('verificaDisciplinaExiste.sql');
   const sqlInsertGradeCurric = await readSQL('insertGradeCurric.sql');
+  const sqlMaxCodGrade = await readSQL('getMaxCodGrade.sql');
+  const sqlInsertGrade = await readSQL('insertGrade.sql');
 
   // Função que lê o arquivo .xlsx e retorna as linhas
   readXlsxFile(filePath).then(async rows => {
-    // Primeira linha deve contar o código do curso
-    const [codCurso, codGrade] = [rows[0][0], rows[0][1]];
+    // Primeira linha deve contar o código do curso, nome da grade e CH da atividade complementar
+    const [codCurso, descricaoGrade, ativComplementarCH] = [
+      rows[0][0],
+      rows[0][1],
+      rows[0][2],
+    ];
+
+    // Pega o ultimo COD_GRADE e soma um
+    const codGrade = await getData(sqlMaxCodGrade, [codCurso]).then(
+      data => data[0].COD_GRADE + 1
+    );
+
+    // Insert GRADE
+    await exec(sqlInsertGrade, [
+      codCurso,
+      codGrade,
+      descricaoGrade,
+      ativComplementarCH,
+    ]).then(
+      result =>
+        result !== 1 && process.exit(console.error('Insert GRADE:', result))
+    );
 
     // Cria o arquivo de LOG
     await createFile(`${file}`);
     await debug(`Quantidade de registros: ${rows.length - 1}\n`);
 
     // Laço que percorre cada linha do arquivo .xlsx
-    for (let i = 2; i < rows.length; i += 1) {
+    for (let i = 1; i < rows.length; i += 1) {
       const [descDisciplina, cargaHoraria, etapa] = [
         rows[i][0],
         rows[i][1],
@@ -75,7 +97,14 @@ const importFile = async () => {
           codDisciplina,
           descDisciplina,
           cargaHoraria,
-        ]);
+        ]).then(
+          result =>
+            result !== 1 &&
+            process.exit(
+              'INSERT DISCIPLINA: ',
+              console.error('Insert DISCIPLINA:', result)
+            )
+        );
       }
 
       // Pega o ultimo NRO_SEQ_GRADE
