@@ -55,8 +55,8 @@ const importFile = async () => {
     ];
 
     // Pega o ultimo COD_GRADE e soma um
-    const codGrade = await getData(sqlMaxCodGrade, [codCurso]).then(
-      data => data[0].COD_GRADE + 1
+    const codGrade = await getData(sqlMaxCodGrade, [codCurso]).then(data =>
+      !data.length ? 1 : data[0].COD_GRADE + 1
     );
 
     // Insert GRADE
@@ -86,7 +86,7 @@ const importFile = async () => {
 
       // Pesquisa se a DISCIPLINA existe (descrição e carga horária)
       codDisciplina = await getData(sqlVerificaDisciplina, [
-        descDisciplina,
+        descDisciplina.substr(0, 70).toUpperCase(),
         cargaHoraria,
       ]).then(data => (data.length ? data[0].COD_DISCIPLINA : false));
 
@@ -95,7 +95,7 @@ const importFile = async () => {
         codDisciplina = await proxId('DISCIPLINA');
         await exec(sqlInsertDisciplina, [
           codDisciplina,
-          descDisciplina,
+          descDisciplina.substr(0, 70),
           cargaHoraria,
         ]).then(
           result =>

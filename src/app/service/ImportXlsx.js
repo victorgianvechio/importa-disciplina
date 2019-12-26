@@ -64,7 +64,7 @@ const importFile = async () => {
 
       // Pesquisa se a DISCIPLINA existe (descrição e carga horária)
       codDisciplina = await getData(sqlVerificaDisciplina, [
-        descDisciplina,
+        descDisciplina.substr(0, 70).toUpperCase(),
         cargaHoraria,
       ]).then(data => (data.length ? data[0].COD_DISCIPLINA : false));
 
@@ -74,7 +74,7 @@ const importFile = async () => {
 
         await exec(sqlInsertDisciplina, [
           codDisciplina,
-          descDisciplina,
+          descDisciplina.substr(0, 70),
           cargaHoraria,
         ]).then(
           result =>
